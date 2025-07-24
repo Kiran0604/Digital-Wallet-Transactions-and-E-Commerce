@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 DATA_DIR = Path("Digital Wallet Analysis")
-
+import pandas as pd
+import streamlit as st
 # Load data with error handling
 def safe_read_csv(path):
     try:
@@ -17,7 +18,6 @@ lit_df = safe_read_csv(DATA_DIR / 'upi_financial_literacy.csv')
 upi_df = safe_read_csv(DATA_DIR / 'UPI Transactions.csv')
 
 geojson_path = DATA_DIR / 'india_state_geo.json'
-import pandas as pd
 # --- Regional & Socio-Economic Analysis (Interactive) ---
 def show_regional_analysis_interactive():
     st.header('Digital Dukaan: Regional & Socio-Economic Analysis')
