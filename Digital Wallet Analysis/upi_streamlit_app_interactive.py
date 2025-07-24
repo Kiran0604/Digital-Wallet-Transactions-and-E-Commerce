@@ -1,14 +1,18 @@
-import pandas as pd
 import os
 from pathlib import Path
-DATA_DIR = Path("Digital Wallet Analysis")
+import pandas as pd
 import streamlit as st
+
+# Get current directory where script runs
+CURRENT_DIR = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+DATA_DIR = CURRENT_DIR / "Digital Wallet Analysis"
+
 # Load data with error handling
 def safe_read_csv(path):
     try:
         return pd.read_csv(path)
     except Exception as e:
-        st.error(f"Error loading {path}: {e}")
+        st.error(f"Error loading {path.name}: {e}")
         return pd.DataFrame()
 
 wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
