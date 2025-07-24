@@ -1,23 +1,4 @@
-import os
-from pathlib import Path
-DATA_DIR = Path("Digital Wallet Analysis")
 import pandas as pd
-import streamlit as st
-# Load data with error handling
-def safe_read_csv(path):
-    try:
-        return pd.read_csv(path)
-    except Exception as e:
-        st.error(f"Error loading {path}: {e}")
-        return pd.DataFrame()
-
-wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
-orders_df = safe_read_csv(DATA_DIR / 'Orders.csv')
-details_df = safe_read_csv(DATA_DIR / 'Details.csv')
-lit_df = safe_read_csv(DATA_DIR / 'upi_financial_literacy.csv')
-upi_df = safe_read_csv(DATA_DIR / 'UPI Transactions.csv')
-
-geojson_path = DATA_DIR / 'india_state_geo.json'
 # --- Regional & Socio-Economic Analysis (Interactive) ---
 def show_regional_analysis_interactive():
     st.header('Digital Dukaan: Regional & Socio-Economic Analysis')
@@ -317,7 +298,13 @@ def safe_read_csv(path):
     except Exception as e:
         st.error(f"Error loading {path}: {e}")
         return pd.DataFrame()
-        
+
+wallet_df = safe_read_csv('digital_wallet_transactions.csv')
+orders_df = safe_read_csv('Orders.csv')
+details_df = safe_read_csv('Details.csv')
+lit_df = safe_read_csv('upi_financial_literacy.csv')
+upi_df = safe_read_csv('UPI Transactions.csv')
+
 # Merge Orders and Details datasets
 try:
     merged_orders_df = pd.merge(orders_df, details_df, on='Order ID', how='inner')
@@ -810,6 +797,8 @@ def show_customer_segmentation():
     db_score = davies_bouldin_score(X, cluster_labels)
     st.write(f"**Silhouette Score (k={n_clusters}):** {sil_score:.3f}")
     st.write(f"**Davies-Bouldin Index (k={n_clusters}):** {db_score:.3f}")
+
+
 
     # Show cluster summary
     cluster_summary = cust_features.groupby('Cluster').agg({
@@ -1478,9 +1467,8 @@ def show_time_series_forecasting():
         hist_col = 'Transaction Amount'
 
     st.line_chart(y, use_container_width=True)
-# Center-aligned heading
-    st.markdown("<h4 style='text-align: center;'>Historical Data</h4>", unsafe_allow_html=True)
-# Show table
+    st.write('**Historical Data:**')
+    # Rename index column to 'Index' for display
     hist_df = monthly_upi[['Transaction_Month', hist_col]].copy()
     hist_df.index.name = 'Index'
     st.write(hist_df)
