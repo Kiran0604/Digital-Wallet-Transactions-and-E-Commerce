@@ -1478,7 +1478,9 @@ def show_time_series_forecasting():
         hist_col = 'Transaction Amount'
 
     st.line_chart(y, use_container_width=True)
-    st.write('**Historical Data:**')
+# Center-aligned heading
+    st.markdown("<h4 style='text-align: center;'>Historical Data</h4>", unsafe_allow_html=True)
+# Show table
     hist_df = monthly_upi[['Transaction_Month', hist_col]].copy()
     hist_df.index.name = 'Index'
     st.write(hist_df)
