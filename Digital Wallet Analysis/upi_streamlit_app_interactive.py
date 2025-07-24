@@ -811,8 +811,6 @@ def show_customer_segmentation():
     st.write(f"**Silhouette Score (k={n_clusters}):** {sil_score:.3f}")
     st.write(f"**Davies-Bouldin Index (k={n_clusters}):** {db_score:.3f}")
 
-
-
     # Show cluster summary
     cluster_summary = cust_features.groupby('Cluster').agg({
         'Order ID': 'mean',
@@ -1481,7 +1479,9 @@ def show_time_series_forecasting():
 
     st.line_chart(y, use_container_width=True)
     st.write('**Historical Data:**')
-    st.write(monthly_upi[['Transaction_Month', hist_col]])
+    hist_df = monthly_upi[['Transaction_Month', hist_col]].copy()
+    hist_df.index.name = 'Index'
+    st.write(hist_df)
     # Insights for historical graph
     st.info(f'''
 **Insights:**
