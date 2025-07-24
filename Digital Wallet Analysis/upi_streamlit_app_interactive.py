@@ -1,9 +1,10 @@
-import os
 from pathlib import Path
-DATA_DIR = Path("Digital Wallet Analysis")
 import pandas as pd
 import streamlit as st
-# Load data with error handling
+
+# Path for Streamlit Cloud (relative to repo root)
+DATA_DIR = Path("Digital Wallet Analysis")
+
 def safe_read_csv(path):
     try:
         return pd.read_csv(path)
@@ -11,6 +12,7 @@ def safe_read_csv(path):
         st.error(f"Error loading {path}: {e}")
         return pd.DataFrame()
 
+# Load data
 wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
 orders_df = safe_read_csv(DATA_DIR / 'Orders.csv')
 details_df = safe_read_csv(DATA_DIR / 'Details.csv')
