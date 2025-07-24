@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
-# Get the directory where this script resides
-SCRIPT_DIR = Path(__file__).parent.resolve()
-DATA_DIR = SCRIPT_DIR  # CSVs and JSON are in the same folder as the script
+DATA_DIR = Path("Digital Wallet Analysis")
 
 # Load data with error handling
 def safe_read_csv(path):
