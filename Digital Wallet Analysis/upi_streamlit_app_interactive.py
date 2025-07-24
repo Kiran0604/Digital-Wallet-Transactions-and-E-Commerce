@@ -1,4 +1,22 @@
 import pandas as pd
+import os
+from pathlib import Path
+DATA_DIR = Path("Digital Wallet Analysis")
+import streamlit as st
+# Load data with error handling
+def safe_read_csv(path):
+    try:
+        return pd.read_csv(path)
+    except Exception as e:
+        st.error(f"Error loading {path}: {e}")
+        return pd.DataFrame()
+
+wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
+orders_df = safe_read_csv(DATA_DIR / 'Orders.csv')
+details_df = safe_read_csv(DATA_DIR / 'Details.csv')
+lit_df = safe_read_csv(DATA_DIR / 'upi_financial_literacy.csv')
+upi_df = safe_read_csv(DATA_DIR / 'UPI Transactions.csv')
+
 # --- Regional & Socio-Economic Analysis (Interactive) ---
 def show_regional_analysis_interactive():
     st.header('Digital Dukaan: Regional & Socio-Economic Analysis')
