@@ -1219,7 +1219,7 @@ def main():
         powerbi_wallet_url = "https://app.powerbi.com/links/7nfC8q--8t?ctid=df7206db-cabc-4b49-b065-e787466975f2&pbi_source=linkShare"
         st.markdown(f"[Open PowerBI Dashboard in new tab]({powerbi_wallet_url})")
         st.markdown("**Screenshot:**")
-        st.image(r"C:\\Users\\Kiran\\OneDrive\\Desktop\\DAV Lab\\Digital Wallet Analysis\\wallet.png", caption="Digital Wallet Dashboard Screenshot", use_container_width=True)
+        st.image(DATA_DIR / "wallet.png", caption="E-Commerce Dashboard Screenshot", use_container_width=True)
         st.markdown("**Key Insights & Findings:**")
         st.markdown('''
 **Digital Wallet Transactions Dashboard Highlights:**
@@ -1239,7 +1239,7 @@ def main():
         powerbi_url = "https://app.powerbi.com/links/hkfDIwwKHq?ctid=df7206db-cabc-4b49-b065-e787466975f2&pbi_source=linkShare"
         st.markdown(f"[Open PowerBI Dashboard in new tab]({powerbi_url})")
         st.markdown("**Screenshot:**")
-        st.image(r"C:\\Users\\Kiran\\OneDrive\\Desktop\\DAV Lab\\Digital Wallet Analysis\\orders.png", caption="E-Commerce Dashboard Screenshot", use_container_width=True)
+        st.image(DATA_DIR / "orders.png", caption="E-Commerce Dashboard Screenshot", use_container_width=True)
         st.markdown("**Key Insights & Findings:**")
         st.markdown('''
 **E-Commerce Sales Dashboard Highlights:**
