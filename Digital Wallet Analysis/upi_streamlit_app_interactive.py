@@ -1,24 +1,4 @@
-from pathlib import Path
 import pandas as pd
-import streamlit as st
-
-# Path for Streamlit Cloud (relative to repo root)
-DATA_DIR = Path("Digital Wallet Analysis")
-
-def safe_read_csv(path):
-    try:
-        return pd.read_csv(path)
-    except Exception as e:
-        st.error(f"Error loading {path}: {e}")
-        return pd.DataFrame()
-
-# Load data
-wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
-orders_df = safe_read_csv(DATA_DIR / 'Orders.csv')
-details_df = safe_read_csv(DATA_DIR / 'Details.csv')
-lit_df = safe_read_csv(DATA_DIR / 'upi_financial_literacy.csv')
-upi_df = safe_read_csv(DATA_DIR / 'UPI Transactions.csv')
-
 # --- Regional & Socio-Economic Analysis (Interactive) ---
 def show_regional_analysis_interactive():
     st.header('Digital Dukaan: Regional & Socio-Economic Analysis')
@@ -311,6 +291,20 @@ from statsmodels.tsa.arima.model import ARIMA
 import warnings
 warnings.filterwarnings('ignore')
 
+# Load data with error handling
+def safe_read_csv(path):
+    try:
+        return pd.read_csv(path)
+    except Exception as e:
+        st.error(f"Error loading {path}: {e}")
+        return pd.DataFrame()
+
+wallet_df = safe_read_csv('digital_wallet_transactions.csv')
+orders_df = safe_read_csv('Orders.csv')
+details_df = safe_read_csv('Details.csv')
+lit_df = safe_read_csv('upi_financial_literacy.csv')
+upi_df = safe_read_csv('UPI Transactions.csv')
+
 # Merge Orders and Details datasets
 try:
     merged_orders_df = pd.merge(orders_df, details_df, on='Order ID', how='inner')
@@ -435,8 +429,8 @@ def show_eda_upi_interactive():
 
     # Location-wise Transaction Count (Interactive Bar)
     location_counts = wallet_data['location'].value_counts().head(10)
-    st.write('Top 10 Transaction Locations (Filtered):')
-    fig5 = px.bar(x=location_counts.values, y=location_counts.index, orientation='h', color=location_counts.index, title=f'Top 10 Locations by Transaction Count ({selected_location})', labels={'x': 'Count', 'y': 'Location'})
+    st.write('Top Transaction Locations (Filtered):')
+    fig5 = px.bar(x=location_counts.values, y=location_counts.index, orientation='h', color=location_counts.index, title=f'Top Locations by Transaction Count ({selected_location})', labels={'x': 'Count', 'y': 'Location'})
     st.plotly_chart(fig5, use_container_width=True)
     st.info('''
 1. Urban locations typically lead in transaction volume.
@@ -697,7 +691,14 @@ def show_eda_merged_orders_interactive():
         plot_bgcolor='#181c23',
         paper_bgcolor='#181c23',
         font=dict(color='white', size=15),
-        legend=dict(x=0.01, y=0.99, bgcolor='rgba(0,0,0,0)')
+        legend=dict(
+            x=1,
+            y=1.15,
+            xanchor='right',
+            yanchor='top',
+            orientation='h',
+            bgcolor='rgba(0,0,0,0)'
+        )
     )
     st.plotly_chart(fig4, use_container_width=True)
     st.info('''
@@ -816,21 +817,14 @@ def show_customer_segmentation():
         'Cluster': 'count'
     }).rename(columns={'Order ID': 'Orders', 'Avg_Order_Value': 'Order_Value', 'Cluster': 'Num_Customers'})
     st.write(f'**Cluster Summary (k={n_clusters}):**')
-    st.write(cluster_summary)
+    # Display cluster summary with smaller font and fixed width to fit all columns
+    st.dataframe(cluster_summary, use_container_width=False, width=950, height=220)
     st.info(f'''
 **Cluster Summary Insights (k={n_clusters}):**
 - Each of the {n_clusters} clusters represents a unique customer segment with distinct purchasing patterns.
 - Clusters with higher average order value or profit may represent premium or loyal customers.
 - The number of customers in each cluster helps identify mass-market vs. niche segments.
 - Use this summary to prioritize marketing and retention strategies for high-value clusters.
-''')
-
-    # Add insights for cluster summary bar chart
-    st.markdown('---')
-    st.subheader('Cluster Feature Distributions')
-    st.info(f'''
-**Feature Distribution Insights (k={n_clusters}):**
-- Compare average order value, profit, and order count across the {n_clusters} clusters to spot high-value segments.
 - Clusters with high average profit and order value are ideal for upselling and loyalty programs.
 - Lower-value clusters may need targeted engagement to increase activity.
 ''')
@@ -846,24 +840,20 @@ def show_customer_segmentation():
     st.write(f"Cluster {highest_avg_value_cluster} has the highest average order value: ₹{cluster_summary.loc[highest_avg_value_cluster, 'Order_Value']:,.2f}")
     highest_profit_cluster = cluster_summary['Profit'].idxmax()
     st.write(f"Cluster {highest_profit_cluster} generates the highest average profit per customer: ₹{cluster_summary.loc[highest_profit_cluster, 'Profit']:,.2f}")
-    st.info(f'''
-**Cluster Insights (k={n_clusters}):**
-- The largest cluster (Cluster {largest_cluster}) may represent the core customer base with {int(cluster_summary.loc[largest_cluster, 'Num_Customers'])} customers.
-- Cluster {highest_avg_value_cluster} has the highest average order value: ₹{cluster_summary.loc[highest_avg_value_cluster, 'Order_Value']:,.2f}.
-- Cluster {highest_profit_cluster} generates the highest average profit per customer: ₹{cluster_summary.loc[highest_profit_cluster, 'Profit']:,.2f}.
-- Use these insights to target marketing, loyalty programs, or personalized offers for each segment.
-''')
-
-
 
     # Show customers in a selected cluster
     st.markdown('---')
     st.subheader('View Customers in Cluster')
-    cluster_options = sorted([str(c) for c in cust_features['Cluster'].unique()])
+    cluster_options = sorted([int(c) for c in cust_features['Cluster'].unique()])
     selected_cluster = st.selectbox('Select cluster to view customers', cluster_options, key='view_cluster')
+    # Ensure correct type for comparison (int)
     cluster_customers = cust_features[cust_features['Cluster'] == selected_cluster]
-    st.write(f"Customers in Cluster {selected_cluster}:")
-    st.write(cluster_customers)
+    if not cluster_customers.empty:
+        cluster_customers_display = cluster_customers.reset_index()
+        st.write(f"Customers in Cluster {selected_cluster}:")
+        st.dataframe(cluster_customers_display, use_container_width=True, height=350)
+    else:
+        st.warning(f"No customers found in Cluster {selected_cluster}.")
     st.info(f'''
 **Customer List Insights (k={n_clusters}):**
 - Review the list of customers in Cluster {selected_cluster} to identify top spenders or frequent buyers.
@@ -1049,11 +1039,11 @@ def show_time_series_analysis():
         )
         fig1 = go.Figure()
         if "Txn Amount" in selected_lines:
-            fig1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['Transaction Amount'], mode='lines', name='Txn Amount', line=dict(color='blue')))
+            fig1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['Transaction Amount'], mode='lines', name='Txn Amount', line=dict(color='teal')))
         if "7-day MA" in selected_lines:
             fig1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_7'], mode='lines', name='7-day MA', line=dict(color='orange')))
         if "30-day MA" in selected_lines:
-            fig1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_30'], mode='lines', name='30-day MA', line=dict(color='green')))
+            fig1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_30'], mode='lines', name='30-day MA', line=dict(color='blue')))
         fig1.update_layout(title='Digital Wallet Transaction Amount with Moving Averages', xaxis_title='Date', yaxis_title='Transaction Amount (Rs.)', plot_bgcolor='#181c23', paper_bgcolor='#181c23', font=dict(color='#eaeaea'))
         st.plotly_chart(fig1, use_container_width=True)
 
@@ -1126,7 +1116,7 @@ def show_time_series_analysis():
         if "7-day MA" in selected_lines_count:
             figc1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_7_count'], mode='lines', name='7-day MA', line=dict(color='orange')))
         if "30-day MA" in selected_lines_count:
-            figc1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_30_count'], mode='lines', name='30-day MA', line=dict(color='green')))
+            figc1.add_trace(go.Scatter(x=wallet_daily['transaction_date'], y=wallet_daily['MA_30_count'], mode='lines', name='30-day MA', line=dict(color='blue')))
         figc1.update_layout(title='Number of Digital Wallet Transactions with Moving Averages', xaxis_title='Date', yaxis_title='Transaction Count', plot_bgcolor='#181c23', paper_bgcolor='#181c23', font=dict(color='#eaeaea'))
         st.plotly_chart(figc1, use_container_width=True)
 
@@ -1190,7 +1180,9 @@ def main():
         "EDA",
         "Time Series Analysis",
         "Machine Learning Models",
-        "Regional & Socio-Economic Analysis"
+        "Regional & Socio-Economic Analysis",
+        "Comprehensive Overview",
+        "PowerBI Dashboards"
     ])
 
     if main_menu == "EDA":
@@ -1205,6 +1197,47 @@ def main():
             show_eda_merged_orders_interactive()
         elif eda_dataset == "UPI Financial Literacy":
             show_eda_lit_interactive()
+    elif main_menu == "PowerBI Dashboards":
+        st.header("PowerBI Dashboards")
+        # Digital Wallet Dashboard
+        st.subheader("Digital Wallet Transactions PowerBI Dashboard")
+        st.markdown("View the interactive PowerBI dashboard for Digital Wallet Transactions:")
+        powerbi_wallet_url = "https://app.powerbi.com/links/7nfC8q--8t?ctid=df7206db-cabc-4b49-b065-e787466975f2&pbi_source=linkShare"
+        st.markdown(f"[Open PowerBI Dashboard in new tab]({powerbi_wallet_url})")
+        st.markdown("**Screenshot:**")
+        st.image(r"C:\\Users\\Kiran\\OneDrive\\Desktop\\DAV Lab\\Digital Wallet Analysis\\wallet.png", caption="Digital Wallet Dashboard Screenshot", use_container_width=True)
+        st.markdown("**Key Insights & Findings:**")
+        st.markdown('''
+**Digital Wallet Transactions Dashboard Highlights:**
+- The dashboard provides a comprehensive overview of digital wallet activity, including total transactions, product amount, fees, and cashback.
+- Top 10 merchants by loyalty points and product amount reveal key business partners and high-activity brands (e.g., Uber, Airbnb, Roblox).
+- Cashback and loyalty programs are significant drivers, with certain merchants offering higher rewards.
+- Payment method analysis shows a diverse mix, with UPI, debit/credit cards, and wallet balance all contributing to transaction volume.
+- Monthly trends highlight seasonality, with product amount and transaction fees peaking in certain months.
+- The dashboard enables filtering by year, status, location, and device type, supporting granular business analysis.
+- Visuals such as bar charts, pie charts, and waterfall charts make it easy to identify top merchants, payment trends, and monthly performance.
+- **Actionable insight:** Focus marketing and loyalty campaigns on top merchants and payment methods to maximize engagement and revenue.
+        ''')
+        st.markdown("---")
+        # E-Commerce Dashboard
+        st.subheader("E-Commerce PowerBI Dashboard")
+        st.markdown("View the interactive PowerBI dashboard for E-Commerce analysis:")
+        powerbi_url = "https://app.powerbi.com/links/hkfDIwwKHq?ctid=df7206db-cabc-4b49-b065-e787466975f2&pbi_source=linkShare"
+        st.markdown(f"[Open PowerBI Dashboard in new tab]({powerbi_url})")
+        st.markdown("**Screenshot:**")
+        st.image(r"C:\\Users\\Kiran\\OneDrive\\Desktop\\DAV Lab\\Digital Wallet Analysis\\orders.png", caption="E-Commerce Dashboard Screenshot", use_container_width=True)
+        st.markdown("**Key Insights & Findings:**")
+        st.markdown('''
+**E-Commerce Sales Dashboard Highlights:**
+- The dashboard summarizes total sales, quantity, profit, and average order value (AOV) at a glance.
+- Maharashtra and Madhya Pradesh are leading states by sales amount, indicating strong regional performance.
+- Product category analysis shows Clothing dominates quantity, while Electronics and Furniture are also significant.
+- Payment mode analysis reveals COD is still widely used, but UPI and cards are gaining traction.
+- Monthly profit trends show clear seasonality, with peaks in December and dips in mid-year months.
+- Top customers and sub-categories are easily identified, supporting targeted marketing and inventory planning.
+- The dashboard’s interactive filters (quarter, state, etc.) allow for deep dives into specific time periods and segments.
+- **Actionable insight:** Leverage high-performing states and categories for expansion, and address low-profit months with targeted promotions.
+        ''')
     elif main_menu == "Time Series Analysis":
         st.sidebar.markdown("### 📈 Time Series Analysis Options")
         ts_options = {
@@ -1245,6 +1278,8 @@ def main():
             show_order_category_classification()
     elif main_menu == "Regional & Socio-Economic Analysis":
         show_regional_analysis_interactive()
+    elif main_menu == "Comprehensive Overview":
+        show_comprehensive_overview()
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
@@ -1326,7 +1361,6 @@ def show_order_category_classification():
         from imblearn.over_sampling import SMOTE
         smote = SMOTE(random_state=42)
         X_bal, y_bal = smote.fit_resample(X_imputed, y_encoded)
-        st.info('Class imbalance addressed using SMOTE.')
     except ImportError:
         X_bal, y_bal = X_imputed, y_encoded
         st.warning('imblearn not installed: class imbalance not addressed.')
@@ -1436,7 +1470,7 @@ def show_order_category_classification():
         if hasattr(clf, 'predict_proba'):
             proba = clf.predict_proba(input_df)[0]
             conf = proba.max()
-            st.success(f'**Predicted Category:** {pred_label}  (Confidence: {conf:.1%})')
+            st.success(f'**Predicted Category:** {pred_label}')
         else:
             st.success(f'**Predicted Category:** {pred_label}')
 
@@ -1445,6 +1479,7 @@ from sklearn.metrics import mean_squared_error
 
 # --- Time Series Forecasting (Sales/Profit Trends) ---
 def show_time_series_forecasting():
+    import pandas as pd
     st.header('Time Series Forecasting (UPI Transaction Trends)')
     st.markdown('''
     Forecast future UPI transaction volume or amount using historical monthly data. Useful for planning, marketing, and resource allocation.
@@ -1472,7 +1507,19 @@ def show_time_series_forecasting():
         metric_name = 'Total Amount'
         hist_col = 'Transaction Amount'
 
-    st.line_chart(y, use_container_width=True)
+    # Add x and y axis labels to the first graph
+    import plotly.graph_objs as go
+    fig_hist = go.Figure()
+    fig_hist.add_trace(go.Scatter(x=monthly_upi['Transaction_Month'], y=y, mode='lines+markers', name=metric_name))
+    fig_hist.update_layout(
+        title=f'Historical {metric_name}',
+        xaxis_title='Month',
+        yaxis_title=metric_name,
+        plot_bgcolor='#181c23',
+        paper_bgcolor='#181c23',
+        font=dict(color='#eaeaea')
+    )
+    st.plotly_chart(fig_hist, use_container_width=True)
     st.write('**Historical Data:**')
     # Rename index column to 'Index' for display
     hist_df = monthly_upi[['Transaction_Month', hist_col]].copy()
@@ -1493,7 +1540,7 @@ def show_time_series_forecasting():
     ---
     **Forecasting Models Used:**
     - **ARIMA:** Captures trends and seasonality for robust short-term forecasts.
-    - **Exponential Smoothing:** Smooths out fluctuations to highlight underlying patterns.
+    - **Prophet:** Handles multiple seasonalities, holidays, and is robust to missing data/outliers. Recommended for advanced business forecasting.
     
     These models provide actionable forecasts to guide business planning and digital payment strategy.
     ''')
@@ -1504,6 +1551,8 @@ def show_time_series_forecasting():
     st.markdown('''
     The ARIMA model predicts future values based on historical patterns, accounting for both trend and seasonality. Use the forecasted values to anticipate transaction surges or declines.
     ''')
+    # --- ARIMA Evaluation Storage ---
+    arima_metrics = None
     try:
         arima_model = ARIMA(y, order=(1,1,1))
         arima_fit = arima_model.fit()
@@ -1522,8 +1571,14 @@ def show_time_series_forecasting():
         arima_pred = arima_fit.predict(start=0, end=len(y)-1)
         mape = np.mean(np.abs((y - arima_pred) / y)) * 100
         rmse = math.sqrt(mean_squared_error(y, arima_pred))
+        from sklearn.metrics import mean_absolute_error, r2_score
+        mae = mean_absolute_error(y, arima_pred)
+        r2 = r2_score(y, arima_pred)
         st.write(f'**ARIMA MAPE:** {mape:.2f}%')
         st.write(f'**ARIMA RMSE:** {rmse:.2f}')
+        st.write(f'**ARIMA MAE:** {mae:.2f}')
+        st.write(f'**ARIMA R²:** {r2:.3f}')
+        arima_metrics = {'MAPE': mape, 'RMSE': rmse, 'MAE': mae, 'R2': r2}
         st.info(f'''
 **ARIMA Insights:**
 - The forecasted curve shows expected UPI transaction {metric_name.lower()} for the next {forecast_periods} months.
@@ -1533,43 +1588,124 @@ def show_time_series_forecasting():
     except Exception as e:
         st.error(f'ARIMA model error: {e}')
 
-    # Exponential Smoothing
-    st.subheader('Exponential Smoothing Forecast')
+
+    # Prophet Forecast
+    st.subheader('Prophet Forecast')
     st.markdown('''
-    Exponential Smoothing highlights underlying patterns by smoothing out short-term fluctuations. It is useful for identifying long-term trends and planning for sustained growth.
+    Prophet is a robust forecasting tool developed by Facebook, designed for business time series with strong seasonal effects, holidays, and missing data. It is well-suited for digital payment and transaction data.
     ''')
+    # --- Prophet Evaluation Storage ---
+    prophet_metrics = None
     try:
-        es_model = ExponentialSmoothing(y, trend='add', seasonal=None)
-        es_fit = es_model.fit()
-        es_forecast = es_fit.forecast(forecast_periods)
-        es_forecast.index = forecast_index
-        st.write('**Forecasted Values (Exp. Smoothing):**')
-        st.write(es_forecast)
+        from prophet import Prophet
+        # Prepare data for Prophet
+        prophet_df = pd.DataFrame({'ds': pd.to_datetime(monthly_upi['Transaction_Month']), 'y': y.values})
+        m = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=False)
+        m.fit(prophet_df)
+        future = m.make_future_dataframe(periods=forecast_periods, freq='MS')
+        forecast = m.predict(future)
+        # Only show forecasted periods
+        forecast_tail = forecast.tail(forecast_periods)
+        st.write('**Forecasted Values (Prophet):**')
+        st.write(forecast_tail[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].set_index('ds'))
         # Plot
-        fig2 = go.Figure()
-        fig2.add_trace(go.Scatter(x=monthly_upi['Transaction_Month'], y=y, mode='lines+markers', name='Historical'))
-        fig2.add_trace(go.Scatter(x=es_forecast.index.strftime('%Y-%m'), y=es_forecast, mode='lines+markers', name='Exp. Smoothing Forecast'))
-        fig2.update_layout(title=f'{metric_name} Forecast (Exponential Smoothing)', xaxis_title='Month', yaxis_title=metric_name)
-        st.plotly_chart(fig2, use_container_width=True)
+        fig3 = go.Figure()
+        # Historical
+        fig3.add_trace(go.Scatter(x=monthly_upi['Transaction_Month'], y=y, mode='lines+markers', name='Historical'))
+        # Prophet forecast (orange)
+        fig3.add_trace(go.Scatter(x=forecast_tail['ds'].dt.strftime('%Y-%m'), y=forecast_tail['yhat'], mode='lines+markers', name='Prophet Forecast', line=dict(color='orange')))
+        fig3.update_layout(title=f'{metric_name} Forecast (Prophet)', xaxis_title='Month', yaxis_title=metric_name)
+        st.plotly_chart(fig3, use_container_width=True)
         st.info(f'''
-**Exponential Smoothing Insights:**
-- The smoothed forecast curve helps visualize long-term growth or decline in UPI transaction {metric_name.lower()}.
-- Use these insights for strategic planning, budgeting, and identifying periods of sustained change.
+**Prophet Insights:**
+- The Prophet forecast (orange) shows expected UPI transaction {metric_name.lower()} for the next {forecast_periods} months.
+- Prophet is robust to missing data, outliers, and can model holidays/seasonality for more accurate business forecasts.
+- Use these predictions for advanced planning, marketing, and resource allocation.
 - Compare with ARIMA results for a comprehensive forecasting strategy.
 ''')
-        fig2.add_trace(go.Scatter(x=es_forecast.index.strftime('%Y-%m'), y=es_forecast, mode='lines+markers', name='Exp. Smoothing Forecast'))
-        fig2.update_layout(title=f'{metric_name} Forecast (Exp. Smoothing)', xaxis_title='Month', yaxis_title=metric_name)
-        st.plotly_chart(fig2, use_container_width=True)
         # Evaluation (in-sample)
-        es_pred = es_fit.fittedvalues
-        mape_es = np.mean(np.abs((y - es_pred) / y)) * 100
-        rmse_es = math.sqrt(mean_squared_error(y, es_pred))
-        st.write(f'**Exp. Smoothing MAPE:** {mape_es:.2f}%')
-        st.write(f'**Exp. Smoothing RMSE:** {rmse_es:.2f}')
+        yhat_in_sample = forecast['yhat'][:len(y)]
+        mape_prophet = np.mean(np.abs((y - yhat_in_sample) / y)) * 100
+        rmse_prophet = math.sqrt(mean_squared_error(y, yhat_in_sample))
+        mae_prophet = mean_absolute_error(y, yhat_in_sample)
+        r2_prophet = r2_score(y, yhat_in_sample)
+        st.write(f'**Prophet MAPE:** {mape_prophet:.2f}%')
+        st.write(f'**Prophet RMSE:** {rmse_prophet:.2f}')
+        st.write(f'**Prophet MAE:** {mae_prophet:.2f}')
+        st.write(f'**Prophet R²:** {r2_prophet:.3f}')
+        prophet_metrics = {'MAPE': mape_prophet, 'RMSE': rmse_prophet, 'MAE': mae_prophet, 'R2': r2_prophet}
+    except ImportError:
+        st.error('Prophet is not installed. Please install the "prophet" package to use this feature.')
     except Exception as e:
-        st.error(f'Exponential Smoothing error: {e}')
+        st.error(f'Prophet model error: {e}')
 
-    st.info('For advanced forecasting, consider using Facebook Prophet or adding seasonality.')
+    # --- Comparison Table and Conclusion ---
+    if arima_metrics and prophet_metrics:
+        import pandas as pd
+        comp_df = pd.DataFrame({
+            'ARIMA': arima_metrics,
+            'Prophet': prophet_metrics
+        })
+        st.markdown('### 📊 Model Evaluation Comparison')
+        st.dataframe(comp_df.style.format('{:.3f}'), use_container_width=True)
+        # Conclusion logic: lower MAPE, RMSE, MAE is better; higher R2 is better
+        arima_better = 0
+        prophet_better = 0
+        for metric in ['MAPE', 'RMSE', 'MAE']:
+            if arima_metrics[metric] < prophet_metrics[metric]:
+                arima_better += 1
+            elif prophet_metrics[metric] < arima_metrics[metric]:
+                prophet_better += 1
+        if arima_metrics['R2'] > prophet_metrics['R2']:
+            arima_better += 1
+        elif prophet_metrics['R2'] > arima_metrics['R2']:
+            prophet_better += 1
+        if arima_better > prophet_better:
+            best_model = 'ARIMA'
+        elif prophet_better > arima_better:
+            best_model = 'Prophet'
+        else:
+            best_model = 'Both models perform similarly.'
+        st.success(f'**Conclusion:** Based on the evaluation metrics, the best model for forecasting {metric_name.lower()} is: {best_model}')
+
+# --- Comprehensive Overview Section Function ---
+def show_comprehensive_overview():
+    st.header('📊 Comprehensive Overview of Key Findings')
+    st.markdown('''
+**Digital Wallet & E-Commerce Trends:**
+- Digital wallet transactions and e-commerce orders show strong growth, with clear peaks during festive seasons and salary dates.
+- Maharashtra and other metropolitan states lead in revenue and transaction volume, while lower-revenue states offer untapped growth opportunities.
+- Digital payments (UPI, Credit Card) dominate, but COD and EMI remain important for specific customer segments.
+- Electronics and Technology categories generate the highest revenue and profit margins.
+- Most customers are casual buyers, but a small group of high-frequency customers drives a large share of revenue.
+- Profit margins vary widely, highlighting the need for pricing and cost optimization.
+
+**Customer Segmentation:**
+- K-Means clustering reveals distinct customer segments, with the largest cluster representing the core customer base.
+- Clusters with higher average order value or profit are key for business growth and should be targeted for loyalty programs.
+- Feature distributions and PCA visualization confirm clear differences in customer behavior, supporting targeted marketing.
+
+**UPI Financial Literacy:**
+- Millennials and Gen Z have the highest financial literacy and UPI usage rates.
+- Most users save a small to moderate percentage of their income; budgeting habits are more common among younger groups.
+- Financial literacy and digital payment adoption are strongly correlated with age and generation, guiding education strategies.
+
+**Time Series & Forecasting:**
+- Both ARIMA and Prophet models are used for forecasting UPI transaction counts and amounts, with results compared using MAPE, RMSE, MAE, and R² metrics.
+- Forecasts are reliable (low error metrics), supporting confident business planning and resource allocation.
+- Prophet forecasts are visually distinguished in orange for clarity.
+- Automated model comparison logic identifies the best forecasting approach for each metric.
+- Seasonality and trend analysis help anticipate demand surges and market slowdowns.
+
+**Machine Learning Models:**
+- Automated order category classification achieves high accuracy and F1 score, streamlining analytics and reporting.
+- Feature importance analysis highlights which transaction details most influence category assignment, supporting business decisions.
+
+**Business Implications:**
+- Use these insights to prioritize high-value customer segments, optimize product and pricing strategies, and plan targeted marketing campaigns.
+- Monitor regional and category trends to identify new market opportunities and manage risk.
+- Leverage robust forecasting to support inventory, staffing, and infrastructure decisions.
+''')
 
 if __name__ == '__main__':
     main()
