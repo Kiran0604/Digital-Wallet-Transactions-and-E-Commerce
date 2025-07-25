@@ -1,4 +1,24 @@
+from pathlib import Path
 import pandas as pd
+import streamlit as st
+
+# Path for Streamlit Cloud (relative to repo root)
+DATA_DIR = Path("Digital Wallet Analysis")
+
+def safe_read_csv(path):
+    try:
+        return pd.read_csv(path)
+    except Exception as e:
+        st.error(f"Error loading {path}: {e}")
+        return pd.DataFrame()
+
+# Load data
+wallet_df = safe_read_csv(DATA_DIR / 'digital_wallet_transactions.csv')
+orders_df = safe_read_csv(DATA_DIR / 'Orders.csv')
+details_df = safe_read_csv(DATA_DIR / 'Details.csv')
+lit_df = safe_read_csv(DATA_DIR / 'upi_financial_literacy.csv')
+upi_df = safe_read_csv(DATA_DIR / 'UPI Transactions.csv')
+
 # --- Regional & Socio-Economic Analysis (Interactive) ---
 def show_regional_analysis_interactive():
     st.header('Digital Dukaan: Regional & Socio-Economic Analysis')
@@ -298,12 +318,6 @@ def safe_read_csv(path):
     except Exception as e:
         st.error(f"Error loading {path}: {e}")
         return pd.DataFrame()
-
-wallet_df = safe_read_csv('digital_wallet_transactions.csv')
-orders_df = safe_read_csv('Orders.csv')
-details_df = safe_read_csv('Details.csv')
-lit_df = safe_read_csv('upi_financial_literacy.csv')
-upi_df = safe_read_csv('UPI Transactions.csv')
 
 # Merge Orders and Details datasets
 try:
