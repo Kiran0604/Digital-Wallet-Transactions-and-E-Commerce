@@ -2,118 +2,37 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Framework-red?style=for-the-badge&logo=streamlit)](https://streamlit.io)
-[![Pandas](https://img.shields.io/badge/Pandas-Analytics-green?style=for-the-badge&logo=pandas)](https://pandas.pydata.org)
 [![Machine Learning](https://img.shields.io/badge/ML-Models-orange?style=for-the-badge&logo=scikit-learn)](https://scikit-learn.org)
 [![PowerBI](https://img.shields.io/badge/PowerBI-Dashboards-yellow?style=for-the-badge&logo=powerbi)](https://powerbi.microsoft.com)
 
 > **🚀 Interactive analytics platform for digital wallet transactions, e-commerce patterns, and financial literacy insights across India with ML models, time series forecasting, and PowerBI integration.**
 
----
-
-## 📊 **Application Architecture & Navigation**
-
-```mermaid
-graph TB
-    A[Main Dashboard] --> B[EDA Section]
-    A --> C[Time Series Analysis]
-    A --> D[Machine Learning Models]
-    A --> E[Regional & Socio-Economic Analysis]
-    A --> F[PowerBI Dashboards]
-    A --> G[Comprehensive Overview]
-    
-    B --> B1[Digital Wallet Transactions]
-    B --> B2[E-Commerce Orders]
-    B --> B3[UPI Financial Literacy]
-    
-    C --> C1[UPI Transaction Forecasting]
-    C --> C2[Digital Wallet Time Series Analysis]
-    
-    D --> D1[Customer Segmentation]
-    D --> D2[Order Category Classification]
-    
-    E --> E1[Geographic Maps]
-    E --> E2[State-wise Analysis]
-    E --> E3[Payment Method Heatmaps]
-    
-    F --> F1[Digital Wallet PowerBI]
-    F --> F2[E-Commerce PowerBI]
-```
+🌐 **Live Demo**: [Digital Wallet Analytics Platform](https://digital-wallet-transactions-and-e-commerce-lm3wjqvnzhxwmkdnsne.streamlit.app/)
 
 ---
 
 ## 🎯 **Core Features**
 
 ### **📈 Exploratory Data Analysis (EDA)**
-- **Digital Wallet Transactions**: Interactive analysis of payment patterns, merchant data, and transaction trends
-- **E-Commerce Orders**: Comprehensive order analysis with profit margins, categories, and customer behavior
-- **UPI Financial Literacy**: Survey insights on age groups, financial habits, and digital adoption patterns
+- **Digital Wallet Transactions**: Payment patterns, merchant data, and transaction trends
+- **E-Commerce Orders**: Order analysis with profit margins, categories, and customer behavior
+- **UPI Financial Literacy**: Age group insights, financial habits, and digital adoption patterns
 
 ### **⏰ Time Series Analysis**
-- **UPI Transaction Forecasting**: ARIMA and Prophet models for predicting future transaction volumes
+- **UPI Transaction Forecasting**: ARIMA and Prophet models for transaction prediction
 - **Digital Wallet Trends**: Moving averages, seasonality detection, and trend analysis
-- **Interactive Charts**: Dynamic time series visualizations with Plotly
 
 ### **🤖 Machine Learning Models**
-- **Customer Segmentation**: K-Means clustering with PCA visualization for market segmentation
-- **Order Category Classification**: Automated classification of e-commerce orders into product categories
-- **Performance Metrics**: Model accuracy, F1-scores, and detailed classification reports
+- **Customer Segmentation**: K-Means clustering with PCA visualization
+- **Order Category Classification**: Automated e-commerce product categorization
 
-### **🗺️ Regional & Socio-Economic Analysis**
+### **🗺️ Regional Analysis**
 - **Geographic Mapping**: State-wise UPI adoption with choropleth visualizations
-- **Payment Heatmaps**: Regional payment method preferences and transaction patterns
-- **Demographic Insights**: Age group analysis and generational financial behavior
+- **Payment Heatmaps**: Regional payment preferences and transaction patterns
 
 ### **📊 PowerBI Integration**
-- **Digital Wallet Dashboard**: Comprehensive PowerBI dashboard for transaction analytics
-- **E-Commerce Dashboard**: Sales performance, regional analysis, and profit tracking
-- **Interactive Reports**: Embedded PowerBI reports with filtering capabilities
-
----
-
-## 🔄 **Data Processing Pipeline**
-
-```mermaid
-flowchart TD
-    subgraph "Data Sources"
-        A[Digital Wallet CSV]
-        B[Orders & Details CSV]
-        C[UPI Literacy Survey CSV]
-        D[UPI Transactions CSV]
-        E[India GeoJSON]
-    end
-    
-    subgraph "Data Processing"
-        F[Data Loading & Validation]
-        G[Feature Engineering]
-        H[Categorical Encoding]
-        I[Geographic Mapping]
-    end
-    
-    subgraph "Analytics Engine"
-        J[Interactive Visualizations]
-        K[ML Model Training]
-        L[Time Series Forecasting]
-        M[Regional Analysis]
-    end
-    
-    A --> F
-    B --> F
-    C --> F
-    D --> F
-    E --> I
-    
-    F --> G
-    G --> H
-    H --> J
-    H --> K
-    H --> L
-    I --> M
-    
-    J --> N[Business Insights]
-    K --> N
-    L --> N
-    M --> N
-```
+- **Digital Wallet Dashboard**: Transaction analytics and merchant performance
+- **E-Commerce Dashboard**: Sales performance and regional analysis
 
 ---
 
@@ -126,7 +45,6 @@ flowchart TD
 | **Visualization** | Plotly, Matplotlib | Interactive charts and maps |
 | **Machine Learning** | Scikit-learn | Customer segmentation and classification |
 | **Time Series** | Statsmodels, Prophet | Forecasting and trend analysis |
-| **Geographic Analysis** | GeoJSON, Choropleth | State-wise mapping and visualization |
 | **Business Intelligence** | PowerBI | Professional dashboards and reports |
 
 ---
@@ -134,74 +52,19 @@ flowchart TD
 ## 📋 **Dataset Structure**
 
 ### **Core Data Sources**
-```
-📊 Digital Wallet Transactions (digital_wallet_transactions.csv)
-├── Transaction amounts, fees, cashback, loyalty points
-├── Payment methods (UPI, Credit Card, Debit Card, Digital Wallet)
-├── Merchant information and product categories
-├── Device types (Mobile, Desktop, Tablet)
-└── Geographic location data
-
-🛒 E-Commerce Data
-├── Orders.csv: Order details, customer info, dates
-├── Details.csv: Product categories, amounts, profit margins
-├── Payment modes and state-wise distribution
-└── Quantity and shipping information
-
-💰 UPI Financial Literacy (upi_financial_literacy.csv)
-├── Age groups and generational classifications
-├── UPI usage frequency and monthly spending
-├── Financial literacy scores and savings rates
-└── Budgeting habits and financial behavior
-
-🗺️ Geographic Data
-├── UPI Transactions.csv: State-wise transaction volumes
-├── india_state_geo.json: Geographic boundaries
-└── Regional adoption patterns
-```
-
----
-
-## 🤖 **Machine Learning Capabilities**
-
-### **Customer Segmentation (K-Means)**
-- **Algorithm**: K-Means clustering with standardized features
-- **Features**: Total spent, order count, profit, quantity
-- **Visualization**: PCA 2D projection with cluster coloring
-- **Business Value**: Market segmentation and targeted marketing
-
-### **Order Category Classification**
-- **Algorithm**: Random Forest classifier
-- **Features**: Amount, profit, quantity, payment mode, customer data
-- **Output**: Automated product category assignment
-- **Accuracy**: Real-time performance metrics and classification reports
-
-### **Performance Monitoring**
-```mermaid
-graph LR
-    A[Data Input] --> B[Feature Extraction]
-    B --> C[Model Training]
-    C --> D[Performance Evaluation]
-    D --> E[Classification Reports]
-    E --> F[Business Insights]
-    
-    D --> G[Accuracy Metrics]
-    D --> H[Confusion Matrix]
-    D --> I[F1-Score Analysis]
-```
+- **Digital Wallet Transactions**: Payment methods, merchant data, device types, geographic data
+- **E-Commerce Orders**: Order details, product categories, profit margins, payment modes
+- **UPI Financial Literacy**: Age groups, usage frequency, financial literacy scores
+- **Geographic Data**: State-wise transaction volumes, regional adoption patterns
 
 ---
 
 ## 🚀 **Quick Start Guide**
 
-### **Installation & Setup**
 ```bash
 # Clone the repository
 git clone https://github.com/Kiran0604/Digital-Wallet-Transactions-and-E-Commerce.git
 cd Digital-Wallet-Transactions-and-E-Commerce
-
-# Navigate to project directory
-cd "Digital Wallet Analysis"
 
 # Install dependencies
 pip install streamlit pandas numpy plotly scikit-learn matplotlib seaborn statsmodels
@@ -210,112 +73,44 @@ pip install streamlit pandas numpy plotly scikit-learn matplotlib seaborn statsm
 streamlit run upi_streamlit_app_interactive.py
 ```
 
-### **Live Demo**
-🌐 **Access the live application**: [Digital Wallet Analytics Platform](https://digital-wallet-transactions-and-e-commerce-lm3wjqvnzhxwmkdnsne.streamlit.app/)
-
 ---
 
 ## 📈 **Dashboard Navigation**
 
-### **Main Menu Options**
-1. **EDA**: Explore three datasets with interactive visualizations
+### **Main Menu Sections**
+1. **EDA**: Interactive data exploration across three datasets
 2. **Time Series Analysis**: UPI forecasting and trend analysis
 3. **Machine Learning Models**: Customer segmentation and classification
-4. **Regional & Socio-Economic Analysis**: Geographic insights and state comparisons
+4. **Regional Analysis**: Geographic insights and state comparisons
 5. **PowerBI Dashboards**: Professional BI reports with live data
 6. **Comprehensive Overview**: Executive summary of key findings
 
-### **Key Visualizations**
-- **Choropleth Maps**: State-wise UPI transaction volumes
-- **Interactive Charts**: Dynamic filtering and real-time updates
-- **Customer Clusters**: PCA-based segmentation visualization
-- **Time Series Plots**: Forecasting with confidence intervals
-- **Heatmaps**: Payment method preferences by geography
-
 ---
 
-## 💡 **Business Intelligence Features**
+## 💡 **Key Insights**
 
-### **PowerBI Integration**
-- **Digital Wallet Dashboard**: Transaction analytics, merchant performance, loyalty programs
-- **E-Commerce Dashboard**: Sales performance, regional analysis, profit tracking
-- **Key Metrics**: Total sales, AOV, profit margins, regional performance
-- **Interactive Filtering**: Year, status, location, device type filters
-
-### **Strategic Insights**
 - **Top Performing States**: Maharashtra and Madhya Pradesh lead in sales
-- **Payment Preferences**: COD still dominant, but UPI gaining traction  
-- **Seasonal Patterns**: December peaks, mid-year dips in profit trends
-- **Category Performance**: Clothing dominates quantity, Electronics high-value
+- **Payment Preferences**: COD dominant, but UPI gaining traction
+- **Seasonal Patterns**: December peaks, mid-year profit dips
+- **ML Performance**: Customer segmentation with PCA visualization
 
 ---
 
-## 🔍 **Advanced Analytics**
+## 📊 **Performance Metrics**
 
-### **Time Series Forecasting**
-- **Models**: ARIMA and Prophet for UPI transaction prediction
-- **Metrics**: MAPE, RMSE, MAE for model evaluation
-- **Seasonality**: Automatic detection of seasonal patterns
-- **Confidence Intervals**: Forecast uncertainty quantification
-
-### **Geographic Analysis**
-- **State Mapping**: Interactive choropleth with transaction heatmaps
-- **Regional Patterns**: Payment method adoption by geography
-- **Demographic Correlations**: Age group vs digital adoption patterns
+| **Metric** | **Value** |
+|------------|-----------|
+| **Datasets** | 4 Primary Sources |
+| **Geographic Coverage** | 36 Indian States/UTs |
+| **ML Models** | 2 Core Models |
+| **Time Series Models** | ARIMA & Prophet |
 
 ---
 
-## 📊 **Key Performance Indicators**
-
-| **Metric** | **Value** | **Insight** |
-|------------|-----------|-------------|
-| **Total Datasets** | 4 Primary Sources | Comprehensive data coverage |
-| **Geographic Coverage** | 36 Indian States/UTs | National scope analysis |
-| **ML Models** | 2 Core Models | Customer segmentation & classification |
-| **Time Series Models** | ARIMA & Prophet | Dual forecasting approach |
-| **Visualization Types** | 15+ Chart Types | Rich interactive experience |
-| **Dashboard Load Time** | <3 seconds | Optimized performance |
-
----
-
-## 🔮 **Future Enhancements**
-
-### **Planned Features**
-- [ ] **Real-time Data Streaming**: Live transaction monitoring
-- [ ] **Advanced ML Models**: Deep learning for complex patterns
-- [ ] **API Development**: RESTful endpoints for data access
-- [ ] **Mobile Optimization**: Responsive design improvements
-
-### **Analytics Expansion**
-- [ ] **Predictive Analytics**: Customer lifetime value prediction
-- [ ] **Anomaly Detection**: Automated fraud detection systems
-- [ ] **Recommendation Engine**: Personalized product suggestions
-- [ ] **Advanced Segmentation**: Behavioral clustering algorithms
-
----
-
-## 🤝 **Contributing**
-
-### **Development Guidelines**
-1. **Fork** the repository and create a feature branch
-2. **Follow** Python PEP 8 style guidelines
-3. **Test** new features thoroughly before submission
-4. **Document** code changes and update README if needed
-5. **Submit** pull request with clear description
-
----
-
-## 👤 **Author**
+##  **Author**
 
 **Kiran R Aithal**
 - **GitHub**: [@Kiran0604](https://github.com/Kiran0604)
-- **Portfolio**: [Digital Analytics Specialist](https://github.com/Kiran0604)
-
----
-
-## 📄 **License**
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
